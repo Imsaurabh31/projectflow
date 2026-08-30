@@ -194,6 +194,74 @@ This creates **4 users, 3 projects, 22 tasks and 12 comments** with realistic co
 
 ---
 
+## Deploying to Vercel
+
+This project is configured for a **monorepo deployment** on Vercel — the frontend and backend are deployed together from the same repository.
+
+### Prerequisites
+
+- A [Vercel account](https://vercel.com)
+- A [MongoDB Atlas](https://mongodb.com/atlas) cluster (the free M0 tier works fine)
+- The [Vercel CLI](https://vercel.com/docs/cli) (optional, for CLI-based deploys)
+
+### 1. Push to GitHub
+
+Make sure your project is pushed to a GitHub repository.
+
+```bash
+git add .
+git commit -m "chore: add vercel deployment config"
+git push
+```
+
+### 2. Import project on Vercel
+
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Click **Import** next to your GitHub repo
+3. Leave the **Root Directory** as `/` (the `vercel.json` at the root handles everything)
+4. Click **Deploy** — Vercel will detect the config automatically
+
+### 3. Set environment variables
+
+In your Vercel project → **Settings → Environment Variables**, add:
+
+| Variable      | Value                                      |
+|---------------|--------------------------------------------|
+| `MONGO_URI`   | Your MongoDB Atlas connection string       |
+| `JWT_SECRET`  | A long random secret string                |
+| `JWT_EXPIRES_IN` | `7d`                                    |
+| `NODE_ENV`    | `production`                               |
+| `CORS_ORIGIN` | Your Vercel app URL e.g. `https://your-app.vercel.app` |
+
+> **Important:** Get your `MONGO_URI` from Atlas → **Connect → Drivers**. Make sure your Atlas cluster's **Network Access** allows `0.0.0.0/0` (all IPs) since Vercel serverless functions use dynamic IPs.
+
+### 4. Redeploy
+
+After adding env vars, trigger a redeploy:
+- Vercel dashboard → **Deployments** → **Redeploy**, or
+- Push any commit to your main branch
+
+### 5. Seed demo data (optional)
+
+After deployment, run the seed against your production Atlas DB from your local machine:
+
+```bash
+cd server
+MONGO_URI=your_atlas_uri node scripts/seed.js
+```
+
+### How it works
+
+```
+vercel.json
+├── /api/*  →  server/api/index.js  (Express app as a serverless function)
+└── /*      →  client/dist/         (Vite static build)
+```
+
+All `/api` requests are routed to the Express serverless function. All other requests serve the React SPA. Because the client and API share the same domain, no CORS issues arise in production.
+
+---
+
 ## Running Tests
 
 ```bash

@@ -14,7 +14,29 @@ const { errorHandler, notFound } = require('./middleware/error.middleware');
 const app = express();
 
 // ── Middleware ────────────────────────────────────────────────
-app.use(cors({ origin: '*' }));
+const allowedOrigins = [
+  'http://localhost:3000',
+  // Vercel preview & production URLs — set CORS_ORIGIN in Vercel env vars
+  // e.g. https://your-app.vercel.app
+  process.env.CORS_ORIGIN,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (curl, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        /\.vercel\.app$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
