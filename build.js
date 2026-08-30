@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-// Vercel build script — runs from repo root
+// Vercel build script
+// vite is in root node_modules (installed by Vercel's install step)
+// We run vite build pointing at the client directory
 const { execSync } = require('child_process');
 const path = require('path');
 
-const clientDir = path.join(__dirname, 'client');
+const root = __dirname;
+const clientDir = path.join(root, 'client');
+const viteBin = path.join(root, 'node_modules', '.bin', 'vite');
 
-console.log('→ Installing client dependencies...');
-execSync('npm install', { cwd: clientDir, stdio: 'inherit' });
-
-console.log('→ Building client with npx vite...');
-// Use npx so it finds vite from client/node_modules without PATH issues
-execSync('npx vite build', { cwd: clientDir, stdio: 'inherit' });
+console.log('→ Building client with vite...');
+execSync(`"${viteBin}" build`, { cwd: clientDir, stdio: 'inherit' });
 
 console.log('✅ Build complete');
