@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "bash build.sh",
+  "buildCommand": "node build.js",
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index.js" }
