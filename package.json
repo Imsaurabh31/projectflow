@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MERN Project Management App",
   "scripts": {
-    "build": "cd client && npm install && npm run build"
+    "build": "npm install --prefix client && npm run build --prefix client"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
