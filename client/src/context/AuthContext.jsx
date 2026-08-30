@@ -30,6 +30,17 @@ const reducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // On mount, verify the stored token is still valid
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    authApi.getMe().catch(() => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      dispatch({ type: 'LOGOUT' });
+    });
+  }, []);
+
   const persist = (token, user) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
