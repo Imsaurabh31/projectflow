@@ -32,3 +32,5 @@ coverage/
 
 # MongoDB binary cache (mongodb-memory-server)
 .cache/
+
+.vercel
